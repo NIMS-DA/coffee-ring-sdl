@@ -1,2 +1,3 @@
 # Coffee ring SDL
-Code for "Flexible self-driving laboratory development with NIMO and IvoryOS" by Yoshikawa, et al.
+Code for "Bridging decision-making engines and workflow design in
+self-driving laboratories: A NIMO–IvoryOS integration study" by Yoshikawa, et al.
