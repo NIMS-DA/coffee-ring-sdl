@@ -7,8 +7,8 @@ self-driving laboratories: A NIMO–IvoryOS integration study](https://doi.org/1
 https://github.com/user-attachments/assets/59473e3e-9ef5-4655-9085-d7f3969cc532
 
 ## Prerequisites
-- [NIMO](https://github.com/NIMS-DA/nimo)
-- [IvoryOS](https://gitlab.com/heingroup/ivoryos)
+- [NIMO](https://github.com/NIMS-DA/nimo) (tested with v2.1.2)
+- [IvoryOS](https://gitlab.com/heingroup/ivoryos) (tested with v1.5.16)
 - [PyLabRobot](https://github.com/PyLabRobot/pylabrobot)
 - [FastSAM](https://github.com/CASIA-LMC-Lab/FastSAM)
 - [PyVISA](https://github.com/pyvisa/pyvisa)

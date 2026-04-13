@@ -1,10 +1,14 @@
 import asyncio
+import nest_asyncio
+nest_asyncio.apply()
+from concurrent.futures import ThreadPoolExecutor
 
 from pylabrobot.liquid_handling import LiquidHandler
 from pylabrobot.liquid_handling.backends import OpentronsBackend
 from pylabrobot.resources.opentrons import (
   OTDeck,
   opentrons_96_tiprack_1000ul,
+  opentrons_96_tiprack_300ul,
   corning_12_wellplate_6point9ml_flat,
   corning_6_wellplate_16point8ml_flat,
   thermoscientificnunc_96_wellplate_1300ul
@@ -17,6 +21,16 @@ class OT2:
 
     self.next_tip = 44
     self.next_mix_well = 38
+    #28-37
+    # 25-27(20251202)
+    # 15-24 ()
+    # 12-14 (20251126)    
+    # 8-10 (20251121)
+    # 7 (20251120)
+    # 6 (20251118)
+    # 0-5 (20251114)
+    # 84-88 (20251113)
+    # 89-95 (20251112)
     self.plate_floor = 5
     self.next_drop_well = 0
 
@@ -28,7 +42,7 @@ class OT2:
 
     asyncio.run(self._setup())
 
-  def _set_next_tip(self, num):
+  def set_next_tip(self, num):
     self.next_tip = num
   
   def _get_tip_spot_name(self, num):
@@ -88,10 +102,13 @@ class OT2:
     self.drop_plate = corning_6_wellplate_16point8ml_flat(name="drop_plate")
     self.lh.deck.assign_child_at_slot(self.drop_plate, slot=2)
 
-  async def _prepare_single_sample_async(self, silica: float, water: float, PVA: float, SDS: float, DTAB: float, PVP: float):
+  async def _prepare_single_sample_async(self, silica: float, PVA: float, SDS: float, DTAB: float, PVP: float):
       mix_well = self._get_well_name96(self.next_mix_well)
       self.next_mix_well += 1
       water_well = self._get_well_name12(self.next_drop_well//3+self.initial_water_well)
+      # water_well = self._get_well_name12(self.plate_floor//3+self.initial_water_well)
+
+      water = 1000 - silica
    
       # surfactants
       Surfactants = [PVA, SDS, DTAB, PVP]
@@ -164,10 +181,24 @@ class OT2:
       await self.lh.discard_tips()
       await self.lh.backend.home()
 
-  def prepare_single_sample(self, pva: float, dtab: float):
+  def prepare_single_sample(self, pva: float, pvp: float):
     silica = 100
-    pvp = 0
+    dtab = 0
     sds = 0
-    water = 1000 - silica
-    print("pva:", pva, "dtab:", dtab)
-    asyncio.run(self._prepare_single_sample_async(silica, water, pva, sds, dtab, pvp))
+
+    # try:
+    #   loop = asyncio.get_running_loop()
+    # except RuntimeError:
+    #   loop = None
+    
+    # if loop and loop.is_running():
+    #   with ThreadPoolExecutor() as pool:
+    #     pool.submit(asyncio.run, self._prepare_single_sample_async(silica, pva, sds, dtab, pvp)).result()
+    # else:
+    asyncio.run(self._prepare_single_sample_async(silica, pva, sds, dtab, pvp))
+
+if __name__ == "__main__":
+  lh = OT2()
+  pvp_list = [0.005]
+  for pvp in pvp_list:
+    lh.prepare_single_sample(0, pvp)
